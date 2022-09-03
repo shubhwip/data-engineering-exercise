@@ -9,7 +9,7 @@ time_table_drop = "DROP TABLE IF EXISTS TIME"
 # CREATE TABLES
 
 songplay_table_create = ("""
-    CREATE TABLE IF NOT EXISTS SONGPLAYS (songplay_id int, start_time bigint, user_id int, level varchar, song_id varchar, artist_id varchar, session_id int, location varchar, user_agent varchar);
+    CREATE TABLE IF NOT EXISTS SONGPLAYS (songplay_id int, start_time timestamptz, user_id int, level varchar, song_id varchar, artist_id varchar, session_id int, location varchar, user_agent varchar);
 """)
 
 user_table_create = ("""
@@ -25,7 +25,7 @@ artist_table_create = ("""
 """)
 
 time_table_create = ("""
-    CREATE TABLE IF NOT EXISTS TIME (timestamp bigint, hour int, day varchar, week int, month int, year int, weekday varchar);
+    CREATE TABLE IF NOT EXISTS TIME (start_time timestamptz, hour int, day varchar, week int, month int, year int, weekday varchar);
 """)
 
 # INSERT RECORDS
@@ -68,7 +68,7 @@ time_table_create = ("""
 songplay_table_insert = ("""
     INSERT INTO SONGPLAYS (songplay_id, start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 """)
-songplay_record = (1, 1541473967796, 38, "FREE", "SOMZWCG12A8C13C480", "ARD7TVE1187B99BFB1", 38, "San Francisco-Oakland-Hayward, CA", "\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36\"")
+songplay_record = (1, '1541473967796', 38, "FREE", "SOMZWCG12A8C13C480", "ARD7TVE1187B99BFB1", 38, "San Francisco-Oakland-Hayward, CA", "\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36\"")
 
 user_table_insert = ("""
     INSERT into USERS (user_id, first_name, last_name, gender, level) 
@@ -94,7 +94,7 @@ time_table_insert = ("""
     INSERT into TIME (start_time, hour, day, week, month, year, weekday) 
     VALUES (%s, %s, %s, %s, %s, %s, %s);
 """)
-time_record = (1541473967796, 3, 'Tuesday', 48, 11, 2018, "true");
+time_record = ('1541473967796', 3, 'Tuesday', 48, 11, 2018, "true");
 
 # FIND SONGS
 
