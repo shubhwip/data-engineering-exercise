@@ -2,10 +2,16 @@ import os
 import glob
 import psycopg2
 import pandas as pd
-from sql_queries import *
+import configparser
+from sql_queries import song_table_insert, artist_table_insert, time_table_insert, user_table_insert, songplay_table_insert
 
 
 def process_song_file(cur, filepath):
+    """
+    - Processes song file  
+    
+    - Insert songs records and artists records into songs and artists table
+    """
     # open song file
     dataframe = pd.read_json(filepath, lines=True)
 
@@ -19,18 +25,21 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
-    # open log file
+    """
+    - Processes user logs file  
+    
+    - Insert songplays, time and user records
+    """
+    # open log file and load it into pandas dataframe
     df = pd.read_json(filepath, lines=True)
 
-    # filter by NextSong action
+    # filter data by NextSong action
     df = df.loc[df['page'] == 'NextSong']
 
     # convert timestamp column to datetime
     df.ts = pd.to_datetime(df['ts'])
     
     # insert time data records
-    # time_data = 
-    # column_labels = 
     time_df = pd.DataFrame().assign(start_time=df['ts'], hour=df['ts'].dt.hour,
      day=df['ts'].dt.dayofweek, week=df['ts'].dt.isocalendar().week, 
      month=df['ts'].dt.month, year=df['ts'].dt.year, weekday=df['ts'].dt.dayofweek > 4)
@@ -50,7 +59,10 @@ def process_log_file(cur, filepath):
         
         # get songid and artistid from song and artist tables
         song_select = ("""
-            SELECT songs.song_id, songs.artist_id FROM (songs JOIN artists ON songs.artist_id = artists.artist_id) WHERE (title = %s and name = %s and duration = %s);
+            SELECT songs.song_id, songs.artist_id 
+            FROM songs 
+            JOIN artists ON songs.artist_id = artists.artist_id
+            WHERE (title = %s and name = %s and duration = %s);
         """)
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
@@ -61,12 +73,17 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        if row.userId != '':
-            songplay_data = (index+1, row.ts, int(row.userId), row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+        if row.userId != '' and artistid and songid:
+            songplay_data = (row.ts, int(row.userId), row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
             cur.execute(songplay_table_insert, songplay_data)
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    - Processes song and user logs files  
+    
+    - Go over each song and user log file and perform database insertion operations
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -86,7 +103,23 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=shubhamjain password=")
+    """
+    - Establishes connection with the sparkify database and gets
+    cursor to it.  
+    
+    - Processes SONGS and LOGS files
+    
+    - Finally, closes the connection. 
+    """
+    # Loading Configuration from ConfigParser
+    config = configparser.ConfigParser()
+    config.read_file(open('postgres.cfg'))
+    HOST=config.get("POSTGRES","HOST")
+    USER=config.get("POSTGRES","USER")
+    PASSWORD=config.get("POSTGRES","PASSWORD")
+    SPARKIFY_DB=config.get("POSTGRES","SPARKIFY_DB")
+
+    conn = psycopg2.connect("host=" + HOST + " dbname=" + SPARKIFY_DB + " user=" + USER + " password=" + PASSWORD)
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
