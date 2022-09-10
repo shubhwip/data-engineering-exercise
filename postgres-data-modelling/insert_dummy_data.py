@@ -1,13 +1,14 @@
 import psycopg2
 from sql_queries import insert_table_queries, insert_table_record
+import configparser
 
-def create_database():
+def create_database(host, username, password, sparkifydb):
     """
     - Creates and connects to the sparkifydb
     - Returns the connection and cursor to sparkifydb
     """
     # connect to sparkify database
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=shubhamjain password=")
+    conn = psycopg2.connect("host=" + host + " dbname=" + sparkifydb + " user=" + username + " password=" + password)
     cur = conn.cursor()
     
     return cur, conn
@@ -32,7 +33,15 @@ def main():
     
     - Finally, closes the connection. 
     """
-    cur, conn = create_database()
+    # Loading Configuration from ConfigParser
+    config = configparser.ConfigParser()
+    config.read_file(open('postgres.cfg'))
+    HOST=config.get("POSTGRES","HOST")
+    USER=config.get("POSTGRES","USER")
+    PASSWORD=config.get("POSTGRES","PASSWORD")
+    SPARKIFY_DB=config.get("POSTGRES","SPARKIFY_DB")
+
+    cur, conn = create_database(HOST, USER, PASSWORD, SPARKIFY_DB)
     
     insert_data(cur, conn)
 
