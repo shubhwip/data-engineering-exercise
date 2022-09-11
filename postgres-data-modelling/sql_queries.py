@@ -2,9 +2,13 @@
 
 songplay_table_drop = "DROP TABLE IF EXISTS SONGPLAYS"
 user_table_drop = "DROP TABLE IF EXISTS USERS"
+user_copy_temp_table_drop = "DROP TABLE IF EXISTS USERS_COPY_TEMP"
 song_table_drop = "DROP TABLE IF EXISTS SONGS"
+song_copy_temp_table_drop = "DROP TABLE IF EXISTS SONGS_COPY_TEMP"
 artist_table_drop = "DROP TABLE IF EXISTS ARTISTS"
+artist_copy_temp_table_drop = "DROP TABLE IF EXISTS ARTISTS_COPY_TEMP"
 time_table_drop = "DROP TABLE IF EXISTS TIME"
+time_copy_temp_table_drop = "DROP TABLE IF EXISTS TIME_COPY_TEMP"
 
 # CREATE TABLES STATEMENTS
 songplay_table_create = ("""
@@ -31,9 +35,29 @@ user_table_create = ("""
     )
 """)
 
+user_copy_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS USERS_COPY_TEMP (
+        user_id int, 
+        first_name varchar, 
+        last_name varchar, 
+        gender varchar, 
+        level varchar
+    )
+""")
+
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS SONGS (
         song_id varchar PRIMARY KEY, 
+        title varchar, 
+        artist_id varchar, 
+        year int, 
+        duration float
+    )
+""")
+
+song_copy_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS SONGS_COPY_TEMP (
+        song_id varchar, 
         title varchar, 
         artist_id varchar, 
         year int, 
@@ -51,9 +75,31 @@ artist_table_create = ("""
     )
 """)
 
+artist_copy_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS ARTISTS_COPY_TEMP (
+        artist_id varchar, 
+        name varchar, 
+        location varchar, 
+        latitude float, 
+        longitude float
+    )
+""")
+
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS TIME (
         start_time timestamp PRIMARY KEY, 
+        hour int, 
+        day varchar, 
+        week int, 
+        month int, 
+        year int, 
+        weekday varchar
+    )
+""")
+
+time_copy_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS TIME_COPY_TEMP (
+        start_time timestamp, 
         hour int, 
         day varchar, 
         week int, 
@@ -114,6 +160,12 @@ user_table_insert = ("""
     VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT (user_id) DO NOTHING
 """)
+user_table_insert_from_temp = ("""
+    INSERT into USERS (user_id, first_name, last_name, gender, level) 
+        SELECT user_id, first_name, last_name, gender, level
+        FROM USERS_COPY_TEMP AS U
+    ON CONFLICT (user_id) DO NOTHING
+""")
 # Dummy record for user table
 user_record = (38, 'Walter', 'Frye', 'M', 'FREE')
 
@@ -123,6 +175,14 @@ song_table_insert = ("""
     VALUES(%s, %s, %s, %s, %s)
     ON CONFLICT (song_id) DO NOTHING
 """)
+
+song_table_insert_from_temp = ("""
+    INSERT into SONGS (song_id, title, artist_id, year, duration) 
+        SELECT song_id, title, artist_id, year, duration
+        FROM SONGS_COPY_TEMP AS S
+    ON CONFLICT (song_id) DO NOTHING
+""")
+
 # Dummy record for song table
 song_record = ("SOMZWCG12A8C13C480", "I Didn't Mean To", "ARD7TVE1187B99BFB1", 0, 218.93179)
 
@@ -130,6 +190,13 @@ song_record = ("SOMZWCG12A8C13C480", "I Didn't Mean To", "ARD7TVE1187B99BFB1", 0
 artist_table_insert = ("""
     INSERT into ARTISTS (artist_id, name, location, latitude, longitude) 
     VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT (artist_id) DO NOTHING
+""")
+
+artist_table_insert_from_temp = ("""
+    INSERT into ARTISTS (artist_id, name, location, latitude, longitude) 
+        SELECT artist_id, name, location, latitude, longitude
+        FROM ARTISTS_COPY_TEMP AS A
     ON CONFLICT (artist_id) DO NOTHING
 """)
 # Dummy record for artist table
@@ -142,6 +209,13 @@ time_table_insert = ("""
     VALUES (%s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (start_time) DO NOTHING
 """)
+
+time_table_insert_from_temp = ("""
+    INSERT into TIME (start_time, hour, day, week, month, year, weekday) 
+        SELECT start_time, hour, day, week, month, year, weekday
+        FROM TIME_COPY_TEMp AS T
+    ON CONFLICT (start_time) DO NOTHING
+""")
 # Dummy record for time table
 time_record = (1541473967796, 3, 'Tuesday', 48, 11, 2018, "true")
 
@@ -152,7 +226,7 @@ song_select = ("""
 
 # QUERY LISTS
 
-create_table_queries = [user_table_create, song_table_create, artist_table_create, time_table_create, songplay_table_create]
-drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
+create_table_queries = [user_table_create, user_copy_temp_table_create, song_table_create, song_copy_temp_table_create, artist_table_create, artist_copy_temp_table_create, time_table_create, time_copy_temp_table_create, songplay_table_create]
+drop_table_queries = [songplay_table_drop, user_table_drop, user_copy_temp_table_drop, song_table_drop, song_copy_temp_table_drop, artist_table_drop, song_copy_temp_table_drop, time_table_drop, time_copy_temp_table_drop]
 insert_table_queries = [user_table_insert, song_table_insert,artist_table_insert,time_table_insert, songplay_table_insert]
 insert_table_record = [user_record, song_record, artist_record, time_record, songplay_record]

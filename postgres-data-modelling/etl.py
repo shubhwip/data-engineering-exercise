@@ -6,56 +6,39 @@ import configparser
 from sql_queries import song_table_insert, artist_table_insert, time_table_insert, user_table_insert, songplay_table_insert
 
 
-def process_song_file(cur, filepath):
+def insert_song_data(cur, song_data, artist_data):
     """
-    - Processes song file  
-    
     - Insert songs records and artists records into songs and artists table
     """
-    # open song file
-    dataframe = pd.read_json(filepath, lines=True)
-
     # insert song record
-    song_data = dataframe[['song_id', 'title', 'artist_id', 'year', 'duration']].values.tolist()[0]
     cur.execute(song_table_insert, song_data)
     
     # insert artist record
-    artist_data = dataframe[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']].values.tolist()[0]
     cur.execute(artist_table_insert, artist_data)
 
-
-def process_log_file(cur, filepath):
+def process_song_file(cur, filepath):
     """
-    - Processes user logs file  
-    
+    - Processes song file  
+    """
+    # open song file
+    dataframe = pd.read_json(filepath, lines=True)
+    song_data = dataframe[['song_id', 'title', 'artist_id', 'year', 'duration']].values.tolist()[0]
+    artist_data = dataframe[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']].values.tolist()[0]
+    insert_song_data(cur, song_data, artist_data)
+
+def insert_log_data(cur, time_df, user_df, log_df):
+    """
     - Insert songplays, time and user records
     """
-    # open log file and load it into pandas dataframe
-    df = pd.read_json(filepath, lines=True)
-
-    # filter data by NextSong action
-    df = df.loc[df['page'] == 'NextSong']
-
-    # convert timestamp column to datetime
-    df.ts = pd.to_datetime(df['ts'])
-    
-    # insert time data records
-    time_df = pd.DataFrame().assign(start_time=df['ts'], hour=df['ts'].dt.hour,
-     day=df['ts'].dt.dayofweek, week=df['ts'].dt.isocalendar().week, 
-     month=df['ts'].dt.month, year=df['ts'].dt.year, weekday=df['ts'].dt.dayofweek > 4)
-
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
-
-    # load user table
-    user_df = df[['userId', 'firstName', 'lastName', 'gender', 'level']]
-
+    
     # insert user records
     for i, row in user_df.iterrows():
         cur.execute(user_table_insert, row)
 
     # insert songplay records
-    for index, row in df.iterrows():
+    for index, row in log_df.iterrows():
         
         # get songid and artistid from song and artist tables
         song_select = ("""
@@ -76,6 +59,29 @@ def process_log_file(cur, filepath):
         if row.userId != '' and artistid and songid:
             songplay_data = (row.ts, int(row.userId), row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
             cur.execute(songplay_table_insert, songplay_data)
+
+def process_log_file(cur, filepath):
+    """
+    - Processes user logs file  
+    """
+    # open log file and load it into pandas dataframe
+    df = pd.read_json(filepath, lines=True)
+
+    # filter data by NextSong action
+    df = df.loc[df['page'] == 'NextSong']
+
+    # convert timestamp column to datetime
+    df.ts = pd.to_datetime(df['ts'])
+    
+    # insert time data records
+    time_df = pd.DataFrame().assign(start_time=df['ts'], hour=df['ts'].dt.hour,
+     day=df['ts'].dt.dayofweek, week=df['ts'].dt.isocalendar().week, 
+     month=df['ts'].dt.month, year=df['ts'].dt.year, weekday=df['ts'].dt.dayofweek > 4)
+
+    # load user table
+    user_df = df[['userId', 'firstName', 'lastName', 'gender', 'level']]
+    
+    insert_log_data(cur, time_df, user_df, df)
 
 
 def process_data(cur, conn, filepath, func):
