@@ -16,10 +16,12 @@ The script, create_tables.py successfully connects to the Sparkify database, dro
 CREATE/INSERT/DROP statements in sql_queries.py specify all columns for each of the five tables with the right data types and conditions.
 
 #### etl.py
-The script, etl.py connects to the Sparkify database, extracts and processes the log_data and song_data, and loads data into the five tables using INSERT SQL Operation.
+The script, `etl.py` connects to the Sparkify database, extracts and processes the log_data and song_data, and loads data into the five tables using INSERT SQL Operation.
 
 #### bulketl.py
-The script, etl.py connects to the Sparkify database, extracts and processes the log_data and song_data, and loads data into the five tables using COPY SQL Operation.
+Temporary tables are created with COPY operations in `sql_queries.py` since there are duplicate data. First all the data with duplicates pushed to these temporary tables and then using these temporary tables we are extracting and loading back data into required tables.
+
+The script, `bulketl.py` connects to the Sparkify database, extracts and processes the log_data and song_data, and loads data into the five tables using COPY SQL Operation.
 
 ## Run Scripts
 #### Run `create_tables.py`
