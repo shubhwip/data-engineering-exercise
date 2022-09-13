@@ -35,6 +35,9 @@ user_table_create = ("""
     )
 """)
 
+# Temporary table is created with no unique constraints
+# To perform COPY operation in `bulketl.py` added the temporary table
+# Later we extract data from this table and load it into main USERS table discarding duplicates
 user_copy_temp_table_create = ("""
     CREATE TABLE IF NOT EXISTS USERS_COPY_TEMP (
         user_id int, 
@@ -55,6 +58,9 @@ song_table_create = ("""
     )
 """)
 
+# Temporary table is created with no unique constraints
+# To perform COPY operation in `bulketl.py` added the temporary table
+# Later we extract data from this table and load it into main SONGS table discarding duplicates
 song_copy_temp_table_create = ("""
     CREATE TABLE IF NOT EXISTS SONGS_COPY_TEMP (
         song_id varchar, 
@@ -75,6 +81,9 @@ artist_table_create = ("""
     )
 """)
 
+# Temporary table is created with no unique constraints
+# To perform COPY operation in `bulketl.py` added the temporary table
+# Later we extract data from this table and load it into main ARTISTS table discarding duplicates
 artist_copy_temp_table_create = ("""
     CREATE TABLE IF NOT EXISTS ARTISTS_COPY_TEMP (
         artist_id varchar, 
@@ -97,6 +106,9 @@ time_table_create = ("""
     )
 """)
 
+# Temporary table is created with no unique constraints
+# To perform COPY operation in `bulketl.py` added the temporary table
+# Later we extract data from this table and load it into main TIME table discarding duplicates
 time_copy_temp_table_create = ("""
     CREATE TABLE IF NOT EXISTS TIME_COPY_TEMP (
         start_time timestamp, 
@@ -160,6 +172,10 @@ user_table_insert = ("""
     VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT (user_id) DO NOTHING
 """)
+
+# ETL Query to load data from temporary table and load it into USERS table
+# Discarding duplicates maintaining data integrity
+# This is used in bulketl.py
 user_table_insert_from_temp = ("""
     INSERT into USERS (user_id, first_name, last_name, gender, level) 
         SELECT user_id, first_name, last_name, gender, level
@@ -176,6 +192,9 @@ song_table_insert = ("""
     ON CONFLICT (song_id) DO NOTHING
 """)
 
+# ETL Query to load data from temporary table and load it into SONGS table
+# Discarding duplicates maintaining data integrity
+# This is used in bulketl.py
 song_table_insert_from_temp = ("""
     INSERT into SONGS (song_id, title, artist_id, year, duration) 
         SELECT song_id, title, artist_id, year, duration
@@ -193,6 +212,9 @@ artist_table_insert = ("""
     ON CONFLICT (artist_id) DO NOTHING
 """)
 
+# ETL Query to load data from temporary table and load it into ARTISTS table
+# Discarding duplicates maintaining data integrity
+# This is used in bulketl.py
 artist_table_insert_from_temp = ("""
     INSERT into ARTISTS (artist_id, name, location, latitude, longitude) 
         SELECT artist_id, name, location, latitude, longitude
@@ -210,6 +232,9 @@ time_table_insert = ("""
     ON CONFLICT (start_time) DO NOTHING
 """)
 
+# ETL Query to load data from temporary table and load it into TIME table
+# Discarding duplicates maintaining data integrity
+# This is used in bulketl.py
 time_table_insert_from_temp = ("""
     INSERT into TIME (start_time, hour, day, week, month, year, weekday) 
         SELECT start_time, hour, day, week, month, year, weekday
@@ -220,12 +245,10 @@ time_table_insert_from_temp = ("""
 time_record = (1541473967796, 3, 'Tuesday', 48, 11, 2018, "true")
 
 # FIND SONGS
-
 song_select = ("""
 """)
 
 # QUERY LISTS
-
 create_table_queries = [user_table_create, user_copy_temp_table_create, song_table_create, song_copy_temp_table_create, artist_table_create, artist_copy_temp_table_create, time_table_create, time_copy_temp_table_create, songplay_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, user_copy_temp_table_drop, song_table_drop, song_copy_temp_table_drop, artist_table_drop, song_copy_temp_table_drop, time_table_drop, time_copy_temp_table_drop]
 insert_table_queries = [user_table_insert, song_table_insert,artist_table_insert,time_table_insert, songplay_table_insert]
