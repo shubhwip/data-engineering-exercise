@@ -180,7 +180,7 @@ user_table_insert_from_temp = ("""
     INSERT into USERS (user_id, first_name, last_name, gender, level) 
         SELECT user_id, first_name, last_name, gender, level
         FROM USERS_COPY_TEMP AS U
-    ON CONFLICT (user_id) DO NOTHING
+    ON CONFLICT (user_id) DO UPDATE SET level=EXCLUDED.level
 """)
 # Dummy record for user table
 user_record = (38, 'Walter', 'Frye', 'M', 'FREE')
