@@ -51,8 +51,8 @@ event_data/2018-11-09-events.csv
 
 Give me the artist, song title and song's length in the music app history that was heard during sessionId = 338, and itemInSession = 4
 
-- Dropped the table music_history1 if exists
-- Created the table music_history1 if exists with following structure
+- Dropped the table artist_song_history if exists
+- Created the table artist_song_history if exists with following structure
 
 ``` sh
 artist text, 
@@ -60,15 +60,15 @@ itemInSession text,
 song text, 
 length text, 
 sessionId text, 
-PRIMARY KEY (sessionId, itemInSession, song)
+PRIMARY KEY (sessionId, itemInSession)
 ```
 
-- Chosen primary keys as sessionId, itemInSession and song to uniquely identify row
-- Using CSVReader, inserted relevant data into music_history1 table
+- Chosen primary keys as sessionId, itemInSession to uniquely identify row
+- Using CSVReader, inserted relevant data into artist_song_history table
 - Executed Select Operation to verify the results
 
 ``` sh
-SELECT artist, song, length FROM music_history1 WHERE sessionId = '338' and itemInSession = '4'
+SELECT artist, song, length FROM artist_song_history WHERE sessionId = 338 and itemInSession = 4
 Output :  
 Faithless Music Matters (Mark Knight Dub) 495.3073
 ```
@@ -77,8 +77,8 @@ Faithless Music Matters (Mark Knight Dub) 495.3073
 
 Give me only the following: name of artist, song (sorted by itemInSession) and user (first and last name) for userid = 10, sessionid = 182
 
-- Dropped the table music_history2 if exists
-- Created the table music_history2 if exists with following structure
+- Dropped the table user_and_music_history if exists
+- Created the table user_and_music_history if exists with following structure
 
 ``` sh
 artist text, 
@@ -88,15 +88,15 @@ firstname text,
 lastname text, 
 userId text, 
 sessionId text, 
-PRIMARY KEY (userId, sessionId, itemInSession)
+PRIMARY KEY ((userId, sessionId), itemInSession)
 ```
 
-- Chosen primary keys as userId, sessionId and itemInSession to uniquely identify row
-- Using CSVReader, inserted relevant data into music_history2 table
+- Chosen primary keys as (userId, sessionId) and itemInSession as composite key to uniquely identify row
+- Using CSVReader, inserted relevant data into user_and_music_history table
 - Executed Select Operation to verify the results
 
 ``` sh
-SELECT artist, song, firstname, lastname FROM music_history2 WHERE userId = '10' and sessionId = '182'
+SELECT artist, song, firstname, lastname FROM user_and_music_history WHERE userId = 10 and sessionId = 182
 Output : 
 Down To The Bone Sylvie Cruz
 Three Drives Sylvie Cruz
@@ -108,22 +108,22 @@ Lonnie Gordon Sylvie Cruz
 
 Give me every user name (first and last) in my music app history who listened to the song 'All Hands Against His Own'
 
-- Dropped the table music_history3 if exists
-- Created the table music_history3 if exists with following structure
+- Dropped the table user_history_with_songs if exists
+- Created the table user_history_with_songs if exists with following structure
 
 ``` sh
 firstname text, 
 lastname text, 
 song text, 
-PRIMARY KEY (song, firstname)
+PRIMARY KEY (song)
 ```
 
-- Chosen primary keys as song and firstname to uniquely identify row
-- Using CSVReader, inserted relevant data into music_history3 table
+- Chosen primary key as song to uniquely identify row
+- Using CSVReader, inserted relevant data into user_history_with_songs table
 - Executed Select Operation to verify the results
 
 ``` sh
-SELECT firstname, lastname FROM music_history3 WHERE song = 'All Hands Against His Own'
+SELECT firstname, lastname FROM user_history_with_songs WHERE song = 'All Hands Against His Own'
 Output : 
 Jacqueline Lynch
 Sara Johnson
@@ -132,7 +132,10 @@ Tegan Levine
 
 ## References
 
-- https://review.udacity.com/#!/rubrics/2475/view
+- <https://review.udacity.com/#!/rubrics/2475/view>
+- <https://stackoverflow.com/questions/24949676/difference-between-partition-key-composite-key-and-clustering-key-in-cassandra/24953331#24953331>
+- <https://stackoverflow.com/questions/18168379/cassandra-choosing-a-partition-key>
 - You can add description of your PRIMARY KEY and how you arrived at the decision to use each for the query
 - Use Panda dataframes to add columns to your query output
 - Improvement - we can insert data while doing csv parsing once for all tables
+
