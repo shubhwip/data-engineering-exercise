@@ -137,6 +137,8 @@ Tegan Levine
 - <https://stackoverflow.com/questions/24949676/difference-between-partition-key-composite-key-and-clustering-key-in-cassandra/24953331#24953331>
 - <https://stackoverflow.com/questions/18168379/cassandra-choosing-a-partition-key>
 - Cassandra Data Types - <https://docs.datastax.com/en/archived/cql/3.3/cql/cql_reference/cql_data_types_c.html>
+- What companies Use Cassandra - <https://www.quora.com/Which-companies-use-Cassandra>
+- <https://pypi.org/project/prettytable/>
 
 ## Review Considerations
 
