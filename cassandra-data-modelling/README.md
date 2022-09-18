@@ -55,11 +55,11 @@ Give me the artist, song title and song's length in the music app history that w
 - Created the table artist_song_history if exists with following structure
 
 ``` sh
-artist text, 
-itemInSession text, 
-song text, 
-length text, 
-sessionId text, 
+sessionId int,
+itemInSession int,
+artist varchar,  
+song varchar, 
+length float,  
 PRIMARY KEY (sessionId, itemInSession)
 ```
 
@@ -81,13 +81,13 @@ Give me only the following: name of artist, song (sorted by itemInSession) and u
 - Created the table user_and_music_history if exists with following structure
 
 ``` sh
-artist text, 
-itemInSession text, 
-song text, 
-firstname text, 
-lastname text, 
-userId text, 
-sessionId text, 
+userId int, 
+sessionId int,
+itemInSession int, 
+artist varchar,  
+song varchar, 
+firstname varchar, 
+lastname varchar, 
 PRIMARY KEY ((userId, sessionId), itemInSession)
 ```
 
@@ -112,10 +112,11 @@ Give me every user name (first and last) in my music app history who listened to
 - Created the table user_history_with_songs if exists with following structure
 
 ``` sh
-firstname text, 
-lastname text, 
-song text, 
-PRIMARY KEY (song)
+userId int,
+song varchar,
+firstname varchar, 
+lastname varchar, 
+PRIMARY KEY (userId, song)
 ```
 
 - Chosen primary key as song to uniquely identify row
@@ -135,6 +136,61 @@ Tegan Levine
 - <https://review.udacity.com/#!/rubrics/2475/view>
 - <https://stackoverflow.com/questions/24949676/difference-between-partition-key-composite-key-and-clustering-key-in-cassandra/24953331#24953331>
 - <https://stackoverflow.com/questions/18168379/cassandra-choosing-a-partition-key>
+- Cassandra Data Types - <https://docs.datastax.com/en/archived/cql/3.3/cql/cql_reference/cql_data_types_c.html>
+
+## Review Considerations
+
+### ETL Pipeline Processing
+
+- Student creates event_data_new.csv file.
+- Student uses the appropriate datatype within the CREATE statement.
+
+``` sh
+✅ Good job! You chose the correct data type for each column.
+Be sure to keep this link for future reference in case you want to check the available Cassandra data types.
+```
+
+### Data Modeling
+
+- Student creates the correct Apache Cassandra tables for each of the three queries. The CREATE TABLE statement should include the appropriate table.
+- Student demonstrates good understanding of data modeling by generating correct SELECT statements to generate the result being asked for in the question.
+The SELECT statement should NOT use ALLOW FILTERING to generate the results.
+- Student should use table names that reflect the query and the result it will generate. Table names should include alphanumeric characters and underscores, and table names must start with a letter.
+- The sequence in which columns appear should reflect how the data is partitioned and the order of the data within the partitions.
+
+For example, your table should be like the following:
+
+``` sh
+CREATE TABLE IF NOT EXISTS music_library (
+      column_C INT, 
+      cloumn_B INT,
+      column_A TEXT,  
+      column_D TEXT,
+     PRIMARY KEY (column_C, column_B)
+)
+INSERT INTO music_library (column_C, column_B, column_A, column_D)
+```
+
+### PRIMARY KEYS
+
+- The combination of the PARTITION KEY alone or with the addition of CLUSTERING COLUMNS should be used appropriately to uniquely identify each row.
+
+### Presentation
+
+- The notebooks should include a description of the query the data is modeled after.
+
+``` sh
+✅ Really good work adding a header for each table explaining how you modeled them!
+Be sure to update it once you make the suggested change above to the third table
+```
+
+- Code should be organized well into the different queries. Any in-line comments that were clearly part of the project instructions should be removed so the notebook provides a professional look.
+
+``` sh
+✅ Great job here! The notebook is clean and organized. You've removed unnecessary comments and instructions.
+Even though we're working with a Jupyter notebook, it's very common to share them with coworkers or present your results to someone.
+```
+
 - You can add description of your PRIMARY KEY and how you arrived at the decision to use each for the query
 - Use Panda dataframes to add columns to your query output
 - Improvement - we can insert data while doing csv parsing once for all tables
