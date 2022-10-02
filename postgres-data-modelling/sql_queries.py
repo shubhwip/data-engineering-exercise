@@ -238,7 +238,7 @@ time_table_insert = ("""
 time_table_insert_from_temp = ("""
     INSERT into TIME (start_time, hour, day, week, month, year, weekday) 
         SELECT start_time, hour, day, week, month, year, weekday
-        FROM TIME_COPY_TEMp AS T
+        FROM TIME_COPY_TEMP AS T
     ON CONFLICT (start_time) DO NOTHING
 """)
 # Dummy record for time table
