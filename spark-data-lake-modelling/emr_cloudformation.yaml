@@ -1,0 +1,53 @@
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-elasticmapreduce-cluster.html
+AWSTemplateFormatVersion: 2010-09-09
+# AWS Service Role would be needed
+# Or we should add subnetId otherwise cluster is launched in EC2-Classic and we need it in EC2-VPC
+Parameters:
+  ClusterName:
+    Type: "String"
+    Default: "Demo Spark Cluster"
+  EmrRelease:
+    Type: "String"
+    Default: "emr-5.36.0"
+    AllowedValues:
+    - "emr-5.36.0"
+    - "emr-6.2.0"
+    - "emr-5.32.0"
+  ClusterInstanceType:
+    Type: "String"
+    Default: "m3.xlarge"
+    AllowedValues:
+    - "m3.xlarge"
+    - "m5.xlarge"
+    - "m5.2xlarge"
+
+Resources:
+  EmrCluster:
+    Type: AWS::EMR::Cluster
+    Properties:
+      Applications:
+      - Name: Spark
+      EbsRootVolumeSize: 100
+      Name: !Ref ClusterName
+      JobFlowRole: EMR_EC2_DefaultRole
+      ServiceRole: EMR_DefaultRole
+      ReleaseLabel: !Ref EmrRelease
+      VisibleToAllUsers: true
+      AutoTerminationPolicy:
+        IdleTimeout: 3600
+      Instances:
+        TerminationProtected: false
+        MasterInstanceGroup:
+          InstanceCount: 1
+          InstanceType: !Ref ClusterInstanceType
+        CoreInstanceGroup:
+          InstanceCount: 2
+          InstanceType: !Ref ClusterInstanceType
+          Market: ON_DEMAND
+          Name: Core
+
+Outputs:
+  ClusterId:
+    Value:
+      Ref: EmrCluster
+    Description: The ID of the EMR Cluster
